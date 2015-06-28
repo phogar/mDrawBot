@@ -131,7 +131,7 @@ void doMove()
 #define WIDTH 380
 #define HEIGHT 310
 #define DIAMETER 11 // the diameter of stepper wheel
-//#define STEPS_PER_MM (STEPS_PER_CIRCLE/PI/DIAMETER) 
+//#define STEPS_PER_MM (STEPS_PER_CIRCLE/PI/DIAMETER)
 #define STEPS_PER_MM 87.58 // the same as 3d printer
 void prepareMove()
 {
@@ -313,7 +313,7 @@ void parseMcode(char * cmd)
       break;
     case 5:
       parseRobotSetup(cmd);
-      break;      
+      break;
     case 10:
       echoRobotSetup();
       break;
@@ -335,14 +335,14 @@ void parseGcode(char * cmd)
     case 28: // home
       tarX=0; tarY=0;
       goHome();
-      break; 
+      break;
   }
 }
 
 void parseCmd(char * cmd)
 {
   if(cmd[0]=='G'){ // gcode
-    parseGcode(cmd+1);  
+    parseGcode(cmd+1);
   }else if(cmd[0]=='M'){ // mcode
     parseMcode(cmd+1);
   }else if(cmd[0]=='P'){
@@ -432,7 +432,7 @@ void loop() {
   Serial.print(digitalRead(xlimit_pin1));Serial.print(' ');
   Serial.print(digitalRead(xlimit_pin2));Serial.print(' ');
   Serial.print(digitalRead(ylimit_pin1));Serial.print(' ');
-  Serial.print(digitalRead(ylimit_pin2));Serial.println();  
+  Serial.print(digitalRead(ylimit_pin2));Serial.println();
   */
 }
 
