@@ -411,17 +411,17 @@ void setup() {
   laser.run(0);
 }
 
-char buf[64];
+char cmd[64];
 int8_t bufindex;
 
 void loop() {
   if(Serial.available()){
     char c = Serial.read();
-    buf[bufindex++]=c; 
+    cmd[bufindex++]=c;
     if(c=='\n'){
-      buf[bufindex]='\0';              // Robbo1 2015/6/8 Add     - Null terminate the string - Essential for first use of 'buf' and good programming practice
-      parseCmd(buf);
-      memset(buf,0,64);
+      cmd[bufindex]='\0';              // Robbo1 2015/6/8 Add     - Null terminate the string - Essential for first use of 'buf' and good programming practice
+      parseCmd(cmd);
+      memset(cmd,0,64);
       bufindex = 0;
     }
     if(bufindex>=64){
