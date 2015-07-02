@@ -24,7 +24,7 @@ static union{
 float curSpd,tarSpd; // speed profile
 float curX,curY,curZ;
 // step value
-int tarA,tarB,posA,posB; // target stepper position
+int posA,posB; // target stepper position
 int8_t motorAfw,motorAbk;
 int8_t motorBfw,motorBbk;
 
@@ -77,7 +77,7 @@ int stepdelay_max=1000;
 #define SEGMENT_DISTANCE 10 // 1 mm for each segment
 #define SPEED_STEP 1
 
-void doMove()
+void doMove(long tarA, long tarB)
 {
   int mDelay=stepdelay_max;
   int speedDiff = -SPEED_STEP;
@@ -140,12 +140,12 @@ void prepareMove(float tarX, float tarY)
   //Serial.print("distance=");Serial.println(distance);
   if (distance < 0.001)
     return;
-  tarA = tarX*STEPS_PER_MM;
-  tarB = tarY*STEPS_PER_MM;
+  long tarA = tarX*STEPS_PER_MM;
+  long tarB = tarY*STEPS_PER_MM;
   //Serial.print("tarL:");Serial.print(tarL);Serial.print(' ');Serial.print("tarR:");Serial.println(tarR);
   //Serial.print("curL:");Serial.print(curL);Serial.print(' ');Serial.print("curR:");Serial.println(curR);
   //Serial.printf("tar Pos %ld %ld\r\n",tarA,tarB);
-  doMove();
+  doMove(tarA, tarB);
   curX = tarX;
   curY = tarY;
 }
