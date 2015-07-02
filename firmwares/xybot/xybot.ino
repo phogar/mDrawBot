@@ -23,7 +23,6 @@ static union{
 // arduino only handle A,B step mapping
 float curSpd,tarSpd; // speed profile
 float curX,curY,curZ;
-float tarX,tarY,tarZ; // target xyz position
 // step value
 int tarA,tarB,posA,posB; // target stepper position
 int8_t motorAfw,motorAbk;
@@ -133,7 +132,7 @@ void doMove()
 #define DIAMETER 11 // the diameter of stepper wheel
 //#define STEPS_PER_MM (STEPS_PER_CIRCLE/PI/DIAMETER)
 #define STEPS_PER_MM 87.58 // the same as 3d printer
-void prepareMove()
+void prepareMove(float tarX, float tarY)
 {
   float dx = tarX - curX;
   float dy = tarY - curY;
@@ -180,16 +179,14 @@ void parseCordinate(char * cmd)
   char * tmp;
   char * str;
   str = strtok_r(cmd, " ", &tmp);
-  tarX = curX;
-  tarY = curY;
+  float tarX = curX;
+  float tarY = curY;
   while(str!=NULL){
     str = strtok_r(0, " ", &tmp);
     if(str[0]=='X'){
       tarX = atof(str+1);
     }else if(str[0]=='Y'){
       tarY = atof(str+1);
-    }else if(str[0]=='Z'){
-      tarZ = atof(str+1);
     }else if(str[0]=='F'){
       float speed = atof(str+1);
       tarSpd = speed/60; // mm/min -> mm/s
@@ -197,7 +194,8 @@ void parseCordinate(char * cmd)
       stepAuxDelay = atoi(str+1);
     }
   }
-  prepareMove();
+  //Serial.print("G1 ");Serial.print(tarX);Serial.print(" ");Serial.println(tarY);
+  prepareMove(tarX, tarY);
 }
 
 void echoRobotSetup()
@@ -333,7 +331,6 @@ void parseGcode(char * cmd)
       parseCordinate(cmd);
       break;
     case 28: // home
-      tarX=0; tarY=0;
       goHome();
       break;
   }
