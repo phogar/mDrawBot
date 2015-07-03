@@ -22,7 +22,6 @@ static union{
 
 // arduino only handle A,B step mapping
 float curSpd,tarSpd; // speed profile
-float curX,curY,curZ;
 // step value
 int posA,posB; // target stepper position
 int8_t motorAfw,motorAbk;
@@ -132,20 +131,30 @@ void doMove(long tarA, long tarB)
 #define DIAMETER 11 // the diameter of stepper wheel
 //#define STEPS_PER_MM (STEPS_PER_CIRCLE/PI/DIAMETER)
 #define STEPS_PER_MM 87.58 // the same as 3d printer
+
+long mm2steps(float a) {
+  return a*STEPS_PER_MM;
+}
+float steps2mm(long a) {
+  return a/STEPS_PER_MM;
+}
 void prepareMove(float tarX, float tarY)
 {
+  static float curX = 0;
+  static float curY = 0;
+  long tarA = mm2steps(tarX);
+  long tarB = mm2steps(tarY);
+  //Serial.print("tarL:");Serial.print(tarL);Serial.print(' ');Serial.print("tarR:");Serial.println(tarR);
+  //Serial.print("curL:");Serial.print(curL);Serial.print(' ');Serial.print("curR:");Serial.println(curR);
+  //Serial.printf("tar Pos %ld %ld\r\n",tarA,tarB);
+  doMove(tarA, tarB);
+
   float dx = tarX - curX;
   float dy = tarY - curY;
   float distance = sqrt(dx*dx+dy*dy);
   //Serial.print("distance=");Serial.println(distance);
   if (distance < 0.001)
     return;
-  long tarA = tarX*STEPS_PER_MM;
-  long tarB = tarY*STEPS_PER_MM;
-  //Serial.print("tarL:");Serial.print(tarL);Serial.print(' ');Serial.print("tarR:");Serial.println(tarR);
-  //Serial.print("curL:");Serial.print(curL);Serial.print(' ');Serial.print("curR:");Serial.println(curR);
-  //Serial.printf("tar Pos %ld %ld\r\n",tarA,tarB);
-  doMove(tarA, tarB);
   curX = tarX;
   curY = tarY;
 }
@@ -163,13 +172,10 @@ void goHome()
   }
   posA = 0;
   posB = 0;
-  curX = 0;
-  curY = 0;
 }
 
 void initPosition()
 {
-  curX=0; curY=0;
   posA = 0;posB = 0;
 }
 
@@ -179,8 +185,8 @@ void parseCordinate(char * cmd)
   char * tmp;
   char * str;
   str = strtok_r(cmd, " ", &tmp);
-  float tarX = curX;
-  float tarY = curY;
+  float tarX = steps2mm(posA);
+  float tarY = steps2mm(posB);
   while(str!=NULL){
     str = strtok_r(0, " ", &tmp);
     if(str[0]=='X'){
@@ -203,8 +209,8 @@ void echoRobotSetup()
   Serial.print("M10 XY ");
   Serial.print(roboSetup.data.width);Serial.print(' ');
   Serial.print(roboSetup.data.height);Serial.print(' ');
-  Serial.print(curX);Serial.print(' ');
-  Serial.print(curY);Serial.print(' ');
+  Serial.print(steps2mm(posA));Serial.print(' ');
+  Serial.print(steps2mm(posB));Serial.print(' ');
   Serial.print("A");Serial.print((int)roboSetup.data.motoADir);
   Serial.print(" B");Serial.print((int)roboSetup.data.motoBDir);
   Serial.print(" H");Serial.print((int)roboSetup.data.motorSwitch);
@@ -343,7 +349,7 @@ void parseCmd(char * cmd)
   }else if(cmd[0]=='M'){ // mcode
     parseMcode(cmd+1);
   }else if(cmd[0]=='P'){
-    Serial.print("POS X");Serial.print(curX);Serial.print(" Y");Serial.println(curY);
+    Serial.print("POS X");Serial.print(steps2mm(posA));Serial.print(" Y");Serial.println(steps2mm(posB));
   }
   Serial.println("OK");
 }
