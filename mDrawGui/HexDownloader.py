@@ -9,7 +9,7 @@ from RobotUtils import *
 class HexDownloader():
     def __init__(self, sig):
         self.sig = sig
-        
+
     def loadHexFile(self, filename):
         f = open(filename,"r")
         lines  = f.readlines()
@@ -18,7 +18,7 @@ class HexDownloader():
             print("%x %s" %(addr,data))
         f.close()
         # save hex size
-    
+
     def downloadThread(self,cmd):
         state = 0
         progress = 0
@@ -47,9 +47,9 @@ class HexDownloader():
                 progress+=(c*2)
                 if state>0 and c>0:
                     self.sig.emit("downpg %d" %(progress))
-                
-                
-    
+
+
+
     def startDownloadUno(self, com, hexfile):
         systemType = platform.system()
         if "Windows" in systemType:
@@ -58,11 +58,14 @@ class HexDownloader():
         elif "Darwin" in systemType:
             avrdudepath = "./avrdude"
             confpath = "avrdude.conf"
+        elif "Linux" in systemType:
+            avrdudepath = "/usr/bin/avrdude"
+            confpath = "avrdude.conf"
         cmd = u"%s -C%s -v -v -v -v -patmega328p -carduino -P%s -b115200 -D -Uflash:w:%s:i" %(avrdudepath,confpath,com,hexfile)
         self.moveListThread = WorkInThread(self.downloadThread,cmd)
         self.moveListThread.setDaemon(True)
         self.moveListThread.start()
-    
+
     def startDownloadLeonardo(self, com, hexfile):
         p = os.getcwd()
         avrdudepath = "%s\\avrdude.exe" %(p)
@@ -71,10 +74,10 @@ class HexDownloader():
         self.moveListThread = WorkInThread(self.downloadThread,cmd)
         self.moveListThread.setDaemon(True)
         self.moveListThread.start()
-        
+
     def serialPost(self, cmd):
         ""
-  
+
     def parseHexLine(self,line):
         cnt = int(line[1:3],16)
         addr = int(line[3:7],16)
@@ -82,11 +85,3 @@ class HexDownloader():
         data = line[9:9+cnt*2]
         crc = line[9+cnt*2:9+cnt*2+2]
         return [addr,hextype,cnt,data,crc]
-
-
-
-
-
-
-
-
